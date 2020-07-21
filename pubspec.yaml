@@ -21,7 +21,10 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  syncfusion_flutter_pdf: ^18.2.45-beta
+  path_provider: ^1.6.11
   wc_form_validators: ^0.1.1
+
   flutter:
     sdk: flutter
 
@@ -49,6 +52,11 @@ flutter:
   assets:
     - assets/images/doc.png
     - assets/images/patient.png
+    - assets/images/patients.png
+    - assets/images/doctor.png
+    - assets/images/background.jpg
+    - assets/images/background2.jpg
+    - assets/images/background3.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

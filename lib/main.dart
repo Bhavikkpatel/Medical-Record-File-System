@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-// import 'LoginPage.dart';
+
+import 'LoginPage.dart';
+
 // import 'Registration.dart';
-import 'register_select.dart';
+// import 'register_select.dart';
 
 void main() => runApp(MyApp());
-
 
 class MyApp extends StatelessWidget {
   @override
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Distributer Medical System',
       debugShowCheckedModeBanner: false,
-      home: register_select(),
+      home: LoginPage(),
     );
   }
 }
