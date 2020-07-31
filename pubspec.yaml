@@ -22,8 +22,18 @@ environment:
 
 dependencies:
   syncfusion_flutter_pdf: ^18.2.45-beta
-  path_provider: ^1.6.11
   wc_form_validators: ^0.1.1
+  # simple_permissions: ^0.1.9
+  flutter_full_pdf_viewer: ^1.0.6
+  #  flutter_pdfview: ^1.0.0+10
+  path_provider: ^1.6.11
+  http: ^0.12.2
+  rflutter_alert: ^1.0.3
+  dropdownfield: ^1.0.3
+  searchable_dropdown: ^1.1.3
+  printing: ^3.5.0
+  pdf: ^1.9.0
+
 
   flutter:
     sdk: flutter
@@ -57,6 +67,8 @@ flutter:
     - assets/images/background.jpg
     - assets/images/background2.jpg
     - assets/images/background3.jpg
+    - assets/icons/greentick.png
+    - assets/icons/redcross.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

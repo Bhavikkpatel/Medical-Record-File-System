@@ -1,8 +1,15 @@
-import 'package:dms/Doctor_Menu.dart';
+import 'package:dms/DoctorHomePage.dart';
 import 'package:dms/register_select.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:wc_form_validators/wc_form_validators.dart';
+import 'doctor_treat.dart';
+import 'userLoginModel.dart';
+import 'package:http/http.dart' as http;
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:flutter/material.dart';
+import 'userHomePage.dart';
+import 'DoctorHomePage.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -27,28 +34,31 @@ Route _createRoute() {
   );
 }
 
-Route _MenuRoute() {
-  return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => Doctor_Menu(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var begin = Offset(0.0, 1.0);
-      var end = Offset.zero;
-      var curve = Curves.ease;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      return SlideTransition(
-        position: animation.drive(tween),
-        child: child,
-      );
-    },
-  );
-}
-
 class _LoginPageState extends State<LoginPage> {
   final _LoginValidate = GlobalKey<FormState>();
 
   bool _passwordVisible = true;
+  UserLoginModel _user;
+
+  @override
+  _onAlertWithCustomContentPressed(context) {
+    Alert(
+        context: context,
+        title: 'Invalid Login Credential',
+        desc: 'try again',
+        buttons: [
+          DialogButton(
+            color: Colors.black,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(
+              "close",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          )
+        ]).show();
+  }
 
   bool validateStructure(String value) {
     String pattern =
@@ -57,8 +67,26 @@ class _LoginPageState extends State<LoginPage> {
     return regExp.hasMatch(value);
   }
 
+  Future<UserLoginModel> loginUser(String phone, String password) async {
+    final String apiUrl = "http://10.0.2.2:8000/login";
+    final response = await http.post(apiUrl, body: {
+      'phone': phone,
+      'password': password,
+    });
+    print(response.body);
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      final String responseString = response.body;
+      return userLoginModelFromJson(responseString);
+    } else {
+      return null;
+    }
+  }
+
   AssetImage background = new AssetImage('assets/images/background3.jpg');
   RegExp Mobile_number = new RegExp(r"^[0-9]{10,10}");
+  var phone = TextEditingController();
+  var pass = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -75,11 +103,11 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    //Email
                     Padding(
                       padding:
                           EdgeInsets.only(left: 50.0, right: 50.0, top: 10.0),
                       child: TextFormField(
+                          controller: phone,
                           decoration: InputDecoration(
                             labelText: "Phone Number",
                             // hintText: "Username",
@@ -109,15 +137,15 @@ class _LoginPageState extends State<LoginPage> {
                       padding: EdgeInsets.only(
                           left: 50.0, right: 50.0, top: 10.0),
                       child: TextFormField(
+                        controller: pass,
                         obscureText: _passwordVisible,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _passwordVisible ? Icons.visibility : Icons
-                                  .visibility_off,
-                              color: Theme
-                                  .of(context)
-                                  .primaryColorDark,
+                              _passwordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Theme.of(context).primaryColorDark,
                             ),
                             onPressed: () {
                               setState(() {
@@ -155,16 +183,35 @@ class _LoginPageState extends State<LoginPage> {
 
                       ),
                     ),
-                    // register button
+
                     Padding(
                       padding: EdgeInsets.all(20.0),
                       child: SizedBox(
                         width: 200.0,
                         height: 50.0,
                         child: RaisedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (_LoginValidate.currentState.validate()) {
-                              Navigator.of(context).push(_MenuRoute());
+                              final UserLoginModel user = await loginUser(
+                                  phone.text, pass.text);
+                              String token = user.token;
+                              setState(() {
+                                _user = user;
+                              });
+                              if (_user.user.userType == 'Doctor') {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) =>
+                                      DoctorHomePage(token)),
+                                );
+                              }
+                              if (_user.user.userType == 'Patient') {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) =>
+                                      userHomePage(token)),
+                                );
+                              }
                             }
                           },
                           shape: RoundedRectangleBorder(
